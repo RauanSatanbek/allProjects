@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+	<link rel="stylesheet" type="text/css" href="http://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
+	<link rel="stylesheet" type="text/css" href="./style.css">
+</head>
+<body>
+	<div id="app">
+		<header>
+			<!-- <i class="ion-navicon" @click="show = !show"></i> -->
+			<nav>
+				<a href="#" @click="sqitchView('square')">square</a>
+				<a href="#" @click="sqitchView('triangle')">triangle</a>
+				<a href="#" @click="sqitchView('circle')">circle</a>
+				<a href="#" @click="sqitchView('egg')">egg</a>
+			</nav>
+		</header>
+		<aside v-show="false" transition="slide"></aside>
+		<div class="body">
+			<!-- <test btn-text="Button 1"></test>	
+			<test btn-text="Button 2"></test>	
+			<test btn-text="Button 3"></test>	
+			<input type="text" class="form-control" v-model="user" @keypress.enter="add(user)">
+			<p v-for="item in array">{{item.name}}</p> -->
+			<component :is="currentView" transition="switch"></component>
+
+		</div>
+
+		<template id="square-template">
+			<div class="square"></div>
+		</template>
+
+		<template id="triangle-template">
+			<div class="triangle"></div>
+		</template>
+
+		<template id="circle-template">
+			<div class="circle"></div>
+		</template>
+
+		<template id="egg-template">
+			<div class="egg"></div>
+		</template>
+		<template id="myTemplate">
+			<br>
+			<h1 v-show="active">{{ btnText }}</h1>
+			<button class="btn btn-primary" @click="active = !active">show</button>
+		</template>
+
+		<template id="Test">
+			<div class="test"  v-show="open">
+				<div class="first">
+					Lorem ipsum dolor sit amet, consectetur adipisicing elit. Fugiat officiis recusandae inventore et esse dolor, id ipsum ducimus veritatis. Placeat!
+				</div>
+				<div class="second">
+					<div class="btn btn-link">OK</div>
+					<a href="#" class="btn btn-link" @click="open = !open">CENSEL</a>
+				</div>
+			</div>
+			<a href="#" class="btn btn-link" @click="open = !open">Open</a>
+		</template>
+	</div>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/vue/1.0.26/vue.min.js"></script>
+	<script type="text/javascript">
+
+		Vue.component("myCom", {
+			template: "#Test",
+			data: function() {
+				return {
+					open: false
+				}
+			},
+			methods: {
+				print: function() {
+					console.log("Hello");
+				}
+			}
+		});
+
+		var app = new Vue({
+			el: "#app",
+			data: {
+				user: "",
+				show: false,
+				currentView: "square",
+				message: "Hello VuewJs !!!",
+				array: [
+					{name: "Leslie Janack", age: 19},
+					{name: "Julio Agle", age: 19},
+					{name: "Jeffrey Said", age: 45},
+					{name: "Marylouise Lufkin", age: 54},
+					{name: "Corrinne Soble", age: 12}
+				]
+			},
+			methods: {
+				reverse: function() {
+					this.message = this.message.split("").reverse().join("");
+				},
+				add: function(item) {
+					console.log(item);
+					this.array.push({name: item});
+				},
+				sqitchView: function(view) {
+					this.currentView = view;
+				}
+			},
+			components: {
+				square: {
+					template: "#square-template"
+				},
+				triangle: {
+					template: "#triangle-template"
+				},
+				circle: {
+					template: "#circle-template"
+				},
+				egg: {
+					template: "#egg-template"
+				}
+			}
+		});
+	</script>
+</body>
+</html>

@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+</head>
+<body>
+	<div id="app"> <br> <br>
+		<!--
+			<button class="btn btn-primary" type="button" @click="deleteUserFromRoom()">deleteUserFromRoom</button>
+			<button class="btn btn-primary" type="button" @click="addUserToRoom()">addUserToRoom</button>
+			<button class="btn btn-primary" type="button" @click="deleteUser()">deleteUser</button>
+			<button class="btn btn-primary" type="button" @click="addUser()">addUser</button>
+		-->
+		<nav>
+			<button class="btn btn-primary" type="button" @click="getAllUsers()">getAllUsers</button>
+			<button class="btn btn-primary" type="button" @click="getAllRooms()">getAllRooms</button>
+			<button class="btn btn-primary" type="button" @click="getAllMessage()">getAllMessage</button>
+			<button class="btn btn-primary" type="button" @click="deleteMessage()">deleteMessage</button>
+			<button class="btn btn-primary" type="button" @click="deleteAllUsers()">deleteAllUsers</button>
+			<button class="btn btn-primary" type="button" @click="deleteAllRooms()">deleteAllRooms</button>
+		</nav>
+		<h1>Add room</h1>
+		<form class="form-inline">
+			<input type="text" class="form-control" v-model="name" placeholder="name"> 
+			<input type="text" class="form-control" v-model="mafia" placeholder="mafia"> 
+			<input type="text" class="form-control" v-model="doctor" placeholder="doctor"> 
+			<input type="text" class="form-control" v-model="citizen" placeholder="citizen"> 
+			<input type="text" class="form-control" v-model="sheriff" placeholder="sheriff"> 
+			<button class="btn btn-primary" type="button" @click="saveRoom()">Save</button>
+		</form>
+		<br><br><br>
+		<div class = "col-lg-7 col-md-7">
+			<h1>Rooms</h1>
+			<table class="table table-hover">
+				<tr>
+					<th>name</th>
+					<th>mafia</th>
+					<th>doctor</th>
+					<th>citizen</th>
+					<th>sheriff</th>
+					<th>number</th>
+					<th>count</th>
+					<th>_id</th>
+					<th>creator id</th>
+				</tr>
+				<tr v-for="room in rooms">
+					<td>{{ room.name }}</td>
+					<td>{{ room.mafia }}</td>
+					<td>{{ room.doctor }}</td>
+					<td>{{ room.citizen }}</td>
+					<td>{{ room.sheriff }}</td>
+					<td>{{ room.number }}</td>
+					<td>{{ room.count }}</td>
+					<td>{{ room._id }}</td>
+					<td>{{ room.creator._id }}</td>
+				</tr>
+			</table>
+		</div>
+
+		<div class = "col-lg-5 col-md-5">
+			<h1>Users</h1>
+			<table class="table table-hover">
+				<tr>
+					<th>name</th>
+					<th>_id</th>
+				</tr>
+				<tr v-for="user in users">
+					<td>{{ user.name }}</td>
+					<td>{{ user._id }}</td>
+				</tr>
+			</table>
+		</div>
+		<br> <br>
+		<h1>Add message</h1>
+		<form class="form-inline">
+			<input type="text" class="form-control" v-model="message" placeholder="message"> 
+			<input type="text" class="form-control" v-model="roomId" placeholder="roomId"> 
+			<input type="text" class="form-control" v-model="userId" placeholder="userId"> 
+			<button class="btn btn-primary" type="button" @click="saveMessage()">Save</button>
+		</form>
+
+		<div class = "col-lg-6 col-md-6">
+			<h1>Messages</h1>
+			<table class="table table-hover">
+				<tr>
+					<th>_id</th>
+					<th>message</th>
+					<th>room</th>
+					<th>user</th>
+				</tr>
+				<tr v-for="message in messages">
+					<td>{{ message._id }}</td>
+					<td>{{ message.message }}</td>
+					<td>{{ message.room[0].name }}</td>
+					<td>{{ message.user[0].name }}</td>
+				</tr>
+			</table>
+		</div>
+	</div>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/vue/1.0.26/vue.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/vue.resource/1.0.3/vue-resource.min.js"></script>
+	<script>
+		new Vue({
+			el: "#app",
+			data: {
+				url: "https://rauan-android-backend.herokuapp.com/",
+				posts: [],
+				name: "",
+				mafia: "",
+				doctor: "",
+				citizen: "",
+				sheriff: "",
+				rooms: [],
+				users: [],
+				message: "",
+				userId: "5854ba5297ba0b00043bf8c1",
+				roomId: "5853a0acb0fccd000433ac5a",
+				count: 2,
+				messages: []
+			},
+			methods: {
+				saveMessage: function() {
+					this.$http.post(this.url + "api/chat/add", {message: this.message, roomId: this.roomId, userId: this.userId, userName: "Test User"}).then(
+						function(response) {
+							console.log(response);
+							this.messages.push(response.data);
+						},
+						function(error) {
+							console.log(error);
+						}
+					);
+				},
+				getAllMessage: function() {
+					this.$http.get(this.url + "api/chat/" + this.roomId).then(
+						function(response) {
+							this.messages = response.data;
+							console.log(response.data, "---messages");
+						},
+						function(error) {
+							console.log(error);
+						}
+					);
+				},
+				deleteMessage: function() {
+					this.$http.delete(this.url + "api/chat/" + this.roomId).then(
+						function(response) {
+							console.log(response, "-- deleteMessage");
+							//this.messages = [];
+						},
+						function(error) {
+							console.log(error);
+						}
+					);
+				},
+				saveRoom: function() {
+					var obj = {name: this.name, mafia: this.mafia, doctor: this.doctor, citizen: this.citizen, sheriff: this.sheriff, creator: this.userId};
+					this.$http.post(this.url + "api/room/add", obj).then(
+						function(response) {
+							console.log(response);
+							this.rooms.push(response.data);
+						},
+						function(error) {
+							console.log(error);
+						}
+					);
+				},
+				getAllRooms: function() {
+					this.$http.get(this.url + "api/room").then(
+						function(response) {
+							for(var i = 0; i < response.data.length; i++) {
+								console.log(response.data[i]);
+							}
+							this.rooms = response.data;
+						},
+						function(error) {
+							console.log(error);
+						}
+					);
+				},
+				deleteAllRooms: function() {
+					this.$http.delete(this.url + "api/room").then(
+						function(response) {
+							console.log(response);
+						},
+						function(error) {
+							console.log(error);
+						}
+					);
+				},
+				getAllUsers: function() {
+					this.$http.get(this.url + "api/user").then(
+						function(response) {
+							console.log(response.data);
+							this.users = response.data;
+						},
+						function(error) {
+							console.log(error);
+						}
+					);
+				},
+				deleteUser: function() {
+					this.$http.post(this.url + "api/user/delete", {id: "5850feeb193fb500042a4d96"}).then(
+						function(response) {
+							console.log(response);
+						},
+						function(error) {
+							console.log(error);
+						}
+					);
+				},
+				deleteAllUsers: function() {
+					this.$http.post(this.url + "api/user/deleteAll", {}).then(
+						function(response) {
+							console.log(response);
+						},
+						function(error) {
+							console.log(error);
+						}
+					);
+				},
+				addUser: function() {
+					this.$http.post(this.url + "api/user/add", {name: "Rauan Satanbek"}).then(
+						function(response) {
+							console.log(response);
+						},
+						function(error) {
+							console.log(error);
+						}
+					);
+				},
+				addUserToRoom: function() {
+					this.$http.post(this.url + "api/room/addUser", {userId: this.userId, roomId: this.roomId, count: this.count})
+						.then(
+							function(response) {
+								console.log(response);
+							},
+							function(error) {
+								console.log(error);
+							}
+						);
+				},
+				deleteUserFromRoom: function() {
+					this.$http.post(this.url + "api/room/daleteUser", {userId: this.userId, roomId: this.roomId,  count: this.count})
+						.then(
+							function(response) {
+								console.log(response);
+							},
+							function(error) {
+								console.log(error);
+							}
+						);
+				},
+				deleteRoom: function() {
+					this.$http.post(this.url + "api/room/5856df3b770bd1000434cb86", {userId: "5856e04e770bd1000434cb8a", count: 3})
+						.then(
+							function(response) {
+								console.log(response);
+							},
+							function(error) {
+								console.log(error);
+							}
+						);
+				}
+			},
+			created: function() {
+				// this.deleteRoom();
+				// this.getAllUsers();
+				// this.getAllRooms();
+				// this.getAllMessage();
+				// this.deleteMessage();
+				// this.deleteUserFromRoom();
+				// this.addUserToRoom();
+				// this.deleteUser();
+				// this.addUser();
+			}
+		});
+	</script>
+</body>
+</html>
+

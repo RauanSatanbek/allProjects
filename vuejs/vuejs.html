@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+	<link rel="stylesheet" type="text/css" href="./style.css">
+</head>
+<body>
+	<message @message-seved="hendle"></message>
+	<ul>
+		<li v-for="message in messages">{{message}}</li>
+	</ul>
+
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/vue/1.0.26/vue.min.js"></script>
+	<script type="text/javascript">
+		Vue.component("message", {
+			template: '<input type="text" class="form-control" v-model="message" @keyup.enter="saveMessage">',
+			data: function() {
+				return {
+					message: ""
+				}
+			},
+			methods: {
+				saveMessage: function() {
+					this.$emit("message-seved", this.message);
+					this.message = "";
+				}
+			}
+		});
+		new Vue({
+			el: "body",
+			data: {
+				messages: []
+			},
+			methods: {
+				hendle: function(message) {
+					this.messages.push(message);
+					console.log(message);
+				}
+			}
+		});		
+	</script>
+</body>
+</html>

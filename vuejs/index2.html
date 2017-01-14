@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+	<link rel="stylesheet" href="bootstrap.min.css">
+</head>
+
+<body>
+	<style>
+		.player {
+			width: 50px;
+			height: 50px;
+			background: #555;
+			border-radius: 5%;
+			position: absolute;
+			border:1px solid #222;
+			box-shadow: inset 0 0 20px 0 rgba(0 ,0 ,0 , 1), 0 0 5px 0 rgba(0 ,0 ,0 , .5);
+		}
+	</style>
+	<div id="app">
+		<div class="player" v-bind:style="{ left: x + 'px', top: y + 'px'}"></div>
+	</div>
+	<script src="./jquery.min.js"></script>
+	<script src="./vue.js"></script>
+	<script src="https://cdn.jsdelivr.net/vue.resource/1.0.3/vue-resource.min.js"></script>
+	<script>
+
+		let vm = new Vue({
+			el: "#app",
+			data: {
+				url: "http://localhost:5000/",
+				m: [],
+				count: 0,
+				moveElement: null,
+				x: 0,
+				y: 0,
+				speed: 110,
+				hide: 1000,
+				id: null
+			},
+			methods: {
+				createDiv(count, x, y) {
+					let id = "";
+					if(!Number.isInteger(count)) id = "shadow" + count;
+					else id = count;
+					$("#app").append(`<div class="player" id="${id}"></div>`);
+
+					$("#" + id).css("top", y + "px");
+					$("#" + id).css("left", x + "px");
+					return id;
+				},
+				move() {
+					// let id = this.createDiv(this.count, this.x, this.y);
+					return () => {
+						if(this.m.includes(37)) {this.x-=this.speed;}
+						if(this.m.includes(38)) {this.y-=this.speed;}
+						if(this.m.includes(39)) {this.x+=this.speed;}
+						if(this.m.includes(40)) {this.y+=this.speed;}
+						// send info
+							// this.sendInfo();
+						let _id = this.createDiv(++this.count, this.x, this.y);
+						// $("#" + _id).fadeOut(this.hide);
+						// setTimeout(() => {
+						// 	$("#" + _id).remove();
+						// }, this.hide);
+
+						// $("#" + id).css("top", this.y + "px");
+						// $("#" + id).css("left", this.x + "px");
+					}
+				},
+				keyDown(keycode) {
+					if(!this.m.includes(keycode)) this.m.push(keycode);
+					this.moveElement();
+				},
+				keyUp(keycode){
+					let index = this.m.indexOf(keycode);
+					this.m.splice(index, 1);
+				},
+				connect() {
+					// this.$http.get(this.url + "api/connect").then(
+					// 	response => {
+							// let player = response.data;
+							// this.id = player.id;
+							this.id = "Player";
+
+							this.moveElement = this.move();
+						// },
+						// error => {console.log(error);}
+					// );
+				},
+
+				sendInfo() {
+					this.$http.post(this.url + "api/sendInfo", {player: {id: this.id, x: this.x, y: this.y}}).then(
+						response => {console.log(response.data);},
+						error => {console.error(error);}
+					);
+				},
+
+				getAllPlayers() {
+					// setInterval(() => {
+						this.$http.get(this.url + "api/getAllPlayers").then(
+							response => {
+								let players = response.data.players;
+								let keys = response.data.keys;
+								keys.forEach(key => {
+									let player = players[key];
+									if($("#" + player.id).length == 0) {
+										this.createDiv(player.id, player.x, player.y);
+									}
+								});
+							},
+							error => {console.error(error);}
+						);
+					// }, 1000);
+				}
+			},
+			created() {
+				this.connect();
+				this.getAllPlayers();
+			}
+		});
+		$(document).ready(() => {
+			$("body")
+				.keydown(v => {
+					vm.keyDown(v.keyCode);
+				})
+				.keyup(v => {
+					vm.keyUp(v.keyCode);
+				});
+		});
+	</script>
+</body>
+</html>
